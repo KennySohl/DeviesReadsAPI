@@ -12,9 +12,10 @@ public class ApiKeyAuthMiddleware
 
     public async Task InvokeAsync(HttpContext context, IConfiguration configuration)
     {
-        // Skip authentication for Swagger UI and OpenAPI endpoints
+        // Skip authentication for Swagger UI, OpenAPI endpoints, and root
         if (context.Request.Path.StartsWithSegments("/swagger") || 
-            context.Request.Path.StartsWithSegments("/api-docs"))
+            context.Request.Path.StartsWithSegments("/api-docs") ||
+            context.Request.Path == "/")
         {
             await _next(context);
             return;

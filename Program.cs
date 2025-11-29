@@ -56,6 +56,29 @@ app.UseHttpsRedirection();
 // Add API Key Authentication Middleware
 app.UseMiddleware<ApiKeyAuthMiddleware>();
 
+// Root endpoint - link to Swagger
+app.MapGet("/", () => Results.Content(
+    """
+    <!DOCTYPE html>
+    <html>
+    <head>
+        <title>Devies Reads API</title>
+        <style>
+            body { background-color: #2b2b2bff; font-family: Arial, sans-serif; max-width: 800px; margin: 50px auto; padding: 20px; }
+            h1 { color: #f8f8f8; }
+            a { color: #5ec0d1; text-decoration: none; font-size: 18px; }
+            a:hover { text-decoration: underline; }
+        </style>
+    </head>
+    <body>
+        <h1>Devies Reads API</h1>
+        <p><a href="/swagger">📚 View API Documentation (Swagger UI)</a></p>
+    </body>
+    </html>
+    """, "text/html"))
+    .WithName("Root")
+    .ExcludeFromDescription();
+
 // - GET all books
 app.MapGet("/api/books", async (BookService bookService) =>
 {
