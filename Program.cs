@@ -1,5 +1,6 @@
 using DeviesReadsAPI.Models;
 using DeviesReadsAPI.Services;
+using DeviesReadsAPI.Middleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,7 +11,38 @@ builder.Services.AddSingleton<BookService>();
 
 // Add Swagger
 builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+builder.Services.AddSwaggerGen(c =>
+{
+    c.SwaggerDoc("v1", new Microsoft.OpenApi.Models.OpenApiInfo 
+    { 
+        Title = "Devies Reads API", 
+        Version = "v1",
+        Description = "Bookstore API with API Key authentication. Click 'Authorize' and enter: dev-test-key-12345"
+    });
+    
+    c.AddSecurityDefinition("ApiKey", new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+    {
+        Type = Microsoft.OpenApi.Models.SecuritySchemeType.ApiKey,
+        In = Microsoft.OpenApi.Models.ParameterLocation.Header,
+        Name = "X-API-Key",
+        Description = "API Key Authentication"
+    });
+    
+    c.AddSecurityRequirement(new Microsoft.OpenApi.Models.OpenApiSecurityRequirement
+    {
+        {
+            new Microsoft.OpenApi.Models.OpenApiSecurityScheme
+            {
+                Reference = new Microsoft.OpenApi.Models.OpenApiReference
+                {
+                    Type = Microsoft.OpenApi.Models.ReferenceType.SecurityScheme,
+                    Id = "ApiKey"
+                }
+            },
+            Array.Empty<string>()
+        }
+    });
+});
 
 var app = builder.Build();
 
@@ -20,6 +52,9 @@ if (app.Environment.IsDevelopment())
     app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
+
+// Add API Key Authentication Middleware
+app.UseMiddleware<ApiKeyAuthMiddleware>();
 
 // - GET all books
 app.MapGet("/api/books", async (BookService bookService) =>
