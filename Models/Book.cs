@@ -43,4 +43,20 @@ public class Book
     
     [BsonElement("categoryName")]
     public string? CategoryName { get; set; }
+    
+    // Rating and reading statistics
+    [BsonElement("averageRating")]
+    public double AverageRating { get; set; } = 0;
+    
+    [BsonElement("haveRead")]
+    public int HaveRead { get; set; } = 0;
+    
+    [BsonElement("currentlyReading")]
+    public int CurrentlyReading { get; set; } = 0;
+    
+    [BsonElement("wantToRead")]
+    public int WantToRead { get; set; } = 0;
+    
+    [BsonElement("userRating")]
+    public double UserRating { get; set; } = 0;
 }
