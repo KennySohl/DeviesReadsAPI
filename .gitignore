@@ -30,6 +30,11 @@ bld/
 # Rider
 .idea/
 
+# Configuration files with secrets
+appsettings.Development.json
+appsettings.Production.json
+appsettings.*.local.json
+
 # User-specific files
 *.rsuser
 

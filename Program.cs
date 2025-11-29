@@ -8,13 +8,16 @@ builder.Services.Configure<BookstoreDatabaseSettings>(
     builder.Configuration.GetSection("BookstoreDatabase"));
 builder.Services.AddSingleton<BookService>();
 
-// Build
-builder.Services.AddOpenApi();
+// Add Swagger
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
 var app = builder.Build();
 
 if (app.Environment.IsDevelopment())
 {
-    app.MapOpenApi();
+    app.UseSwagger();
+    app.UseSwaggerUI();
 }
 app.UseHttpsRedirection();
 
@@ -24,8 +27,7 @@ app.MapGet("/api/books", async (BookService bookService) =>
     var books = await bookService.GetBooksAsync();
     return Results.Ok(books);
 })
-.WithName("GetAllBooks")
-.WithOpenApi();
+.WithName("GetAllBooks");
 
 // - GET book by id
 app.MapGet("/api/books/{id}", async (string id, BookService bookService) =>
@@ -33,8 +35,7 @@ app.MapGet("/api/books/{id}", async (string id, BookService bookService) =>
     var book = await bookService.GetBookAsync(id);
     return book is not null ? Results.Ok(book) : Results.NotFound();
 })
-.WithName("GetBook")
-.WithOpenApi();
+.WithName("GetBook");
 
 // - POST new book
 app.MapPost("/api/books", async (Book newBook, BookService bookService) =>
@@ -42,8 +43,7 @@ app.MapPost("/api/books", async (Book newBook, BookService bookService) =>
     await bookService.CreateBookAsync(newBook);
     return Results.Created($"/api/books/{newBook.Id}", newBook);
 })
-.WithName("CreateBook")
-.WithOpenApi();
+.WithName("CreateBook");
 
 // - PUT update book
 app.MapPut("/api/books/{id}", async (string id, Book updatedBook, BookService bookService) =>
@@ -55,8 +55,7 @@ app.MapPut("/api/books/{id}", async (string id, Book updatedBook, BookService bo
     await bookService.UpdateBookAsync(id, updatedBook);
     return Results.NoContent();
 })
-.WithName("UpdateBook")
-.WithOpenApi();
+.WithName("UpdateBook");
 
 // - DELETE book
 app.MapDelete("/api/books/{id}", async (string id, BookService bookService) =>
@@ -67,8 +66,7 @@ app.MapDelete("/api/books/{id}", async (string id, BookService bookService) =>
     await bookService.RemoveBookAsync(id);
     return Results.NoContent();
 })
-.WithName("DeleteBook")
-.WithOpenApi();
+.WithName("DeleteBook");
 
 // - POST purchase book
 app.MapPost("/api/books/{id}/purchase", async (string id, PurchaseRequest request, BookService bookService) =>
@@ -76,8 +74,7 @@ app.MapPost("/api/books/{id}/purchase", async (string id, PurchaseRequest reques
     var result = await bookService.PurchaseBookAsync(id, request.Quantity);
     return result.Success ? Results.Ok(result) : Results.BadRequest(result);
 })
-.WithName("PurchaseBook")
-.WithOpenApi();
+.WithName("PurchaseBook");
 
 // - GET search books
 app.MapGet("/api/books/search/{query}", async (string query, BookService bookService) =>
@@ -85,8 +82,7 @@ app.MapGet("/api/books/search/{query}", async (string query, BookService bookSer
     var books = await bookService.SearchBooksAsync(query);
     return Results.Ok(books);
 })
-.WithName("SearchBooks")
-.WithOpenApi();
+.WithName("SearchBooks");
 
 // - GET books by category
 app.MapGet("/api/books/category/{categoryId}", async (string categoryId, BookService bookService) =>
@@ -94,51 +90,44 @@ app.MapGet("/api/books/category/{categoryId}", async (string categoryId, BookSer
     var books = await bookService.GetBooksByCategoryAsync(categoryId);
     return Results.Ok(books);
 })
-.WithName("GetBooksByCategory")
-.WithOpenApi();
+.WithName("GetBooksByCategory");
 
 // - Authors endpoints
 app.MapGet("/api/authors", async (BookService bookService) =>
     Results.Ok(await bookService.GetAuthorsAsync()))
-.WithName("GetAllAuthors")
-.WithOpenApi();
+.WithName("GetAllAuthors");
 
 app.MapGet("/api/authors/{id}", async (string id, BookService bookService) =>
 {
     var author = await bookService.GetAuthorAsync(id);
     return author is not null ? Results.Ok(author) : Results.NotFound();
 })
-.WithName("GetAuthor")
-.WithOpenApi();
+.WithName("GetAuthor");
 
 app.MapPost("/api/authors", async (Author newAuthor, BookService bookService) =>
 {
     await bookService.CreateAuthorAsync(newAuthor);
     return Results.Created($"/api/authors/{newAuthor.Id}", newAuthor);
 })
-.WithName("CreateAuthor")
-.WithOpenApi();
+.WithName("CreateAuthor");
 
 // - Categories endpoints
 app.MapGet("/api/categories", async (BookService bookService) =>
     Results.Ok(await bookService.GetCategoriesAsync()))
-.WithName("GetAllCategories")
-.WithOpenApi();
+.WithName("GetAllCategories");
 
 app.MapGet("/api/categories/{id}", async (string id, BookService bookService) =>
 {
     var category = await bookService.GetCategoryAsync(id);
     return category is not null ? Results.Ok(category) : Results.NotFound();
 })
-.WithName("GetCategory")
-.WithOpenApi();
+.WithName("GetCategory");
 
 app.MapPost("/api/categories", async (Category newCategory, BookService bookService) =>
 {
     await bookService.CreateCategoryAsync(newCategory);
     return Results.Created($"/api/categories/{newCategory.Id}", newCategory);
 })
-.WithName("CreateCategory")
-.WithOpenApi();
+.WithName("CreateCategory");
 
 app.Run();
