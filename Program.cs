@@ -166,3 +166,6 @@ app.MapPost("/api/categories", async (Category newCategory, BookService bookServ
 .WithName("CreateCategory");
 
 app.Run();
+
+// Make Program class accessible to tests
+public partial class Program { }

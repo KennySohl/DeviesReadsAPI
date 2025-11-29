@@ -30,10 +30,6 @@ public class ApiKeyAuthMiddleware
 
         // Get valid API key from configuration
         var apiKey = configuration.GetValue<string>("ApiKey");
-        
-        // Debug logging
-        Console.WriteLine($"Expected API Key: '{apiKey}'");
-        Console.WriteLine($"Received API Key: '{extractedApiKey}'");
 
         // Validate API key
         if (string.IsNullOrEmpty(apiKey) || !apiKey.Equals(extractedApiKey.ToString()))
